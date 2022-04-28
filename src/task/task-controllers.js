@@ -1,32 +1,37 @@
-const getTasks = (todoItems) => {
+const getTasks = (repository) => {
   return (req, res) => {
-    return res.json({ data: todoItems, status: "success" });
+    return res.json({ data: repository.findAll(), status: "success" });
   };
 };
 
-const createTask = (todoItems, index) => {
+const createTask = (repository) => {
   return (req, res) => {
-    todoItems.push({
-      index: index++,
+    if (!req.body.id) {
+      throw Error("Missing id!");
+    }
+    repository.create({
+      id: req.body.id, // change id by uuid so the front end can handle the creation
       value: req.body.value,
       done: false,
     });
-    return res.json({ data: todoItems, status: "success" });
+    return res.json({ data: repository.findAll(), status: "success" });
   };
 };
 
-const deleteTask = (todoItems) => {
+const deleteTask = (repository) => {
   return (req, res) => {
-    todoItems = todoItems.filter((d) => d.index != Number(req.params.id));
-    return res.json({ data: todoItems, status: "success" });
+    repository.delete(req.params.id);
+    return res.json({ data: repository.findAll(), status: "success" });
   };
 };
 
-const updateTask = (todoItems) => {
+const updateTask = (repository) => {
   return (req, res) => {
-    todoItems.filter((d) => d.index == Number(req.params.id))[0].done =
-      req.body.done;
-    return res.json({ data: todoItems, status: "success" });
+    repository.update({
+      id: req.params.id ?? req.body.id, // change id by uuid so the front end can handle the creation
+      done: req.body.done,
+    });
+    return res.json({ data: repository.findAll(), status: "success" });
   };
 };
 
