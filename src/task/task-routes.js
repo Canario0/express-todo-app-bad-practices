@@ -1,4 +1,10 @@
 const express = require("express");
+const {
+  getTasks,
+  createTask,
+  deleteTask,
+  updateTask,
+} = require("./task-controllers");
 
 const routes = express.Router();
 // === store == //
@@ -11,31 +17,16 @@ var index = 5;
 // get all tasks
 routes
   .route("/")
-  .get((req, res) => {
-    return res.json({ data: todoItems, status: "success" });
-  })
+  .get(getTasks(todoItems))
   // create a task
-  .post((req, res) => {
-    todoItems.push({
-      index: index++,
-      value: req.body.value,
-      done: false,
-    });
-    return res.json({ data: todoItems, status: "success" });
-  });
+  .post(createTask(todoItems, index));
 
 routes
   .route("/:id")
   // delete a task
-  .delete((req, res) => {
-    var todoItems = todoItems.filter((d) => d.index != +req.params.id);
-    return res.json({ data: todoItems, status: "success" });
-  })
+  .delete(deleteTask(todoItems))
   // update a task
-  .patch((req, res) => {
-    todoItems.filter((d) => d.index == +req.params.id)[0].done = req.body.done;
-    return res.json({ data: todoItems, status: "success" });
-  });
+  .patch(updateTask(todoItems));
 
 module.exports = {
   taskRoutes: routes,
